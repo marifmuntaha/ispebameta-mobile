@@ -64,7 +64,6 @@ const Route = ({auth, user}) => {
                         component={UserScreen}
                         options={{headerShown: false, statusBarTranslucent: true, statusBarStyle: 'light'}}
                     />
-
                 </Stack.Navigator>
             </NavigationContainer>
         </UserContext.Provider>

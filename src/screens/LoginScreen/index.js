@@ -1,4 +1,14 @@
-import {Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    ActivityIndicator,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import IconLogo from '../../images/IconLogo.png';
 import {actionType, Dispatch} from "../../reducer";
 import {useContext, useState} from "react";
@@ -117,6 +127,7 @@ const LoginScreen = ({navigation}) => {
                             setLoading: setLoading,
                         }).then(resp => {
                             resp ? navigation.replace('DashboardScreen') : null
+                            
                         }).catch(error => {
                             Toast.show(error.response ? error.response.data.message : error.message, {
                                 duration: 2000,
@@ -125,7 +136,11 @@ const LoginScreen = ({navigation}) => {
                         })
                     }}
                     style={styles.formButtonLogin}>
-                    <Text style={styles.formButtonLabel}>MASUK</Text>
+                    <Text style={styles.formButtonLabel}>
+                        {loading
+                            ? <ActivityIndicator size="large" color="#FFF"/>
+                            : 'MASUK'}
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => navigation.replace('RegisterScreen')}
