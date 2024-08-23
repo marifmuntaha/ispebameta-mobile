@@ -1,16 +1,14 @@
-import {StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput} from "react-native";
+import {StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, StatusBar} from "react-native";
 import Header from "../../layouts/Header";
 import {UserContext} from "./UserContext";
-import {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import * as SecureStore from "expo-secure-store";
+import {APICore} from "../../utils/APICore";
+import {SafeAreaView} from "react-native-safe-area-context";
 
-const TeacherScreen = ({navigation}) => {
-    const user = useContext(UserContext);
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-        }
-    });
+const UserScreen = ({navigation}) => {
+    const api = new APICore()
+    const {user} = api.getLoggedInUser();
     const content = StyleSheet.create({
         container: {
             flex: 1,
@@ -43,71 +41,74 @@ const TeacherScreen = ({navigation}) => {
         },
         formButton: {
             backgroundColor: "#FFC14F",
-            borderRadius: 15,
-            height: 60,
+            borderRadius: 5,
+            height: 45,
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 20,
+            marginTop: 10,
         },
         formButtonLabel: {
             fontWeight: 'bold',
             color: "white",
-            fontSize: 18
+            fontSize: 14
         }
     })
     return (
-        <View style={styles.container}>
-            <Header
-                navigation={navigation}
-                backTo="DashboardScreen"
-                title="DATA PENGGUNA"
-                subtitle="Informasi Data Pengguna"
-            />
-            <ScrollView style={content.container}>
-                <View style={content.formBlock}>
-                    <Text style={content.formInputLabel}>Nama Lengkap</Text>
-                    <View style={content.formInput}>
-                        <TextInput
-                            style={content.formInputPlaceholder}
-                            placeholderTextColor="#929090"
-                            value={user.name}
-                        />
+        <>
+            <SafeAreaView style={{flex: 2}}>
+                <Header
+                    navigation={navigation}
+                    backTo="DashboardScreen"
+                    title="DATA PENGGUNA"
+                    subtitle="Informasi Data Pengguna"
+                />
+                <ScrollView style={content.container}>
+                    <View style={content.formBlock}>
+                        <Text style={content.formInputLabel}>Nama Lengkap</Text>
+                        <View style={content.formInput}>
+                            <TextInput
+                                style={content.formInputPlaceholder}
+                                placeholderTextColor="#929090"
+                                value={user.name}
+                            />
+                        </View>
+                        <Text style={content.formInputLabel}>Alamat Email</Text>
+                        <View style={content.formInput}>
+                            <TextInput
+                                style={content.formInputPlaceholder}
+                                placeholderTextColor="#929090"
+                                value={user.email}
+                            />
+                        </View>
+                        <Text style={content.formInputLabel}>Jabatan</Text>
+                        <View style={content.formInput}>
+                            <TextInput
+                                style={content.formInputPlaceholder}
+                                placeholderTextColor="#929090"
+                                value={user.position}
+                            />
+                        </View>
+                        <Text style={content.formInputLabel}>Institusi</Text>
+                        <View style={content.formInput}>
+                            <TextInput
+                                style={content.formInputPlaceholder}
+                                placeholderTextColor="#929090"
+                                value={user.institution}
+                            />
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                api.setLoggedInUser()
+                                navigation.replace('SplashScreen')
+                            }}
+                            style={content.formButton}
+                        >
+                            <Text style={content.formButtonLabel}>KELUAR</Text>
+                        </TouchableOpacity>
                     </View>
-                    <Text style={content.formInputLabel}>Alamat Email</Text>
-                    <View style={content.formInput}>
-                        <TextInput
-                            style={content.formInputPlaceholder}
-                            placeholderTextColor="#929090"
-                            value={user.email}
-                        />
-                    </View>
-                    <Text style={content.formInputLabel}>Jabatan</Text>
-                    <View style={content.formInput}>
-                        <TextInput
-                            style={content.formInputPlaceholder}
-                            placeholderTextColor="#929090"
-                            value={user.position}
-                        />
-                    </View>
-                    <Text style={content.formInputLabel}>Institusi</Text>
-                    <View style={content.formInput}>
-                        <TextInput
-                            style={content.formInputPlaceholder}
-                            placeholderTextColor="#929090"
-                            value={user.institution}
-                        />
-                    </View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            SecureStore.deleteItemAsync('token').then(() => navigation.replace('LoginScreen'))
-                        }}
-                        style={content.formButton}
-                    >
-                        <Text style={content.formButtonLabel}>KELUAR</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </View>
+                </ScrollView>
+            </SafeAreaView>
+        </>
     )
 }
-export default TeacherScreen;
+export default UserScreen;

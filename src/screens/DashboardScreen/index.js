@@ -9,7 +9,11 @@ import Dimension from "../../layouts/Dimention";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "../UserScreen/UserContext";
 import {actionType, Dispatch} from "../../reducer";
+import {APICore} from "../../utils/APICore";
+import {SafeAreaView} from "react-native-safe-area-context";
 const DashboardScreen = ({navigation}) => {
+    const api = new APICore();
+    const {user} = api.getLoggedInUser();
     const [teachers, setTeachers] = useState([]);
     const [reports, setReports] = useState([]);
     const styles = StyleSheet.create({
@@ -28,9 +32,10 @@ const DashboardScreen = ({navigation}) => {
     })
     const header    = StyleSheet.create({
         container: {
-            borderRadius: 20,
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
             width: "100%",
-            height: "35%",
+            height: 350,
             backgroundColor: '#161D6F',
         },
         navbar: {
@@ -132,87 +137,96 @@ const DashboardScreen = ({navigation}) => {
             width: 90,
             height: 90
         }
-    })
-    const user = useContext(UserContext);
+    });
     useEffect(() => {
-        Dispatch(actionType.TEACHER_GET, {setData: setTeachers}, {user: user.id}).then();
-        Dispatch(actionType.EVALUATION_GET, {setData: setReports}, {user: user.id}).then();
+        api.get('/teacher', {user: user.id}).then(resp => {
+            setTeachers(resp.data.result)
+        }).catch(error => {
+            console.log(error.response)
+        });
+        api.get('/report', {user: user.id}).then(resp => {
+            setReports(resp.data.result)
+        }).catch(error => {
+            console.log(error.response)
+        });
     }, []);
     return (
-        <View style={styles.container}>
-            <View style={header.container}>
-                <View style={header.navbar}>
-                    <View style={header.navbarTitle}>
-                        <Image source={IconLogo} style={header.navbarTitleLogo}/>
-                        <Text style={header.navbarTitleText}>Dashboard</Text>
+        <SafeAreaView style={{flex: 2}}>
+            <View style={styles.container}>
+                <View style={header.container}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', borderWidth: 1}}>
+                        <View style={header.navbarTitle}>
+                            <Image source={IconLogo} style={header.navbarTitleLogo}/>
+                            <Text style={header.navbarTitleText}>Dashboard</Text>
+                        </View>
+                        <View style={header.navbarUser}>
+                            <TouchableOpacity onPress={() => navigation.replace("UserScreen")}>
+                                <Image source={IconUserWhite} style={header.navbarUserIcon}/>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    <View style={header.navbarUser}>
-                        <TouchableOpacity onPress={() => navigation.replace("UserScreen")}>
-                            <Image source={IconUserWhite} style={header.navbarUserIcon}/>
+                    <View style={header.greeting}>
+                        <Text style={header.greetingText}>Selamat Datang</Text>
+                        <Text style={header.greetingText}>{user.name}</Text>
+                    </View>
+                </View>
+                <View style={widget.container}>
+                    <View style={widget.box}>
+                        <Text style={widget.boxText}>{teachers.length} GURU</Text>
+                        <TouchableOpacity
+                            onPress = {() => navigation.replace('TeacherScreen')}
+                            style={widget.boxButton}>
+                            <Text style={widget.boxButtonLabel}>LIHAT</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={widget.box}>
+                        <Text style={widget.boxText}>{reports.length} LAPORAN</Text>
+                        <TouchableOpacity
+                            onPress = {() => navigation.replace('ReportScreen')}
+                            style={widget.boxButton}>
+                            <Text style={widget.boxButtonLabel}>LIHAT</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={header.greeting}>
-                    <Text style={header.greetingText}>Selamat Datang</Text>
-                    <Text style={header.greetingText}>{user.name}</Text>
-                </View>
+                <ScrollView>
+                    <Text style={styles.mainmenu}>MAINMENU</Text>
+                    <View style={mainmenu.container}>
+                        <TouchableOpacity
+                            onPress = {() => navigation.replace('TeacherScreen')}
+                            style={mainmenu.boxButton}>
+                            <Image source={IconUserDefault} style={mainmenu.boxButtonImage}/>
+                            <Text style={widget.boxButtonLabel}>DATA GURU</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress = {() => navigation.replace('SupervisiScreen')}
+                            style={mainmenu.boxButton}>
+                            <Image source={IconPencilDefault} style={mainmenu.boxButtonImage}/>
+                            <Text style={widget.boxButtonLabel}>PENILAIAN</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={mainmenu.container}>
+                        <TouchableOpacity
+                            onPress = {() => navigation.replace('ReportScreen')}
+                            style={mainmenu.boxButton}>
+                            <Image source={IconFileDefault} style={{
+                                height: 90,
+                                width: 66
+                            }}/>
+                            <Text style={widget.boxButtonLabel}>LAPORAN</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress = {() => alert('Halaman Tentang')}
+                            style={mainmenu.boxButton}>
+                            <Image source={IconQuestion} style={{
+                                width: 58,
+                                height: 90
+                            }}/>
+                            <Text style={widget.boxButtonLabel}>TENTANG</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
             </View>
-            <View style={widget.container}>
-                <View style={widget.box}>
-                    <Text style={widget.boxText}>{teachers.length} GURU</Text>
-                    <TouchableOpacity
-                        onPress = {() => navigation.replace('TeacherScreen')}
-                        style={widget.boxButton}>
-                        <Text style={widget.boxButtonLabel}>LIHAT</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={widget.box}>
-                    <Text style={widget.boxText}>{reports.length} LAPORAN</Text>
-                    <TouchableOpacity
-                        onPress = {() => navigation.replace('ReportScreen')}
-                        style={widget.boxButton}>
-                        <Text style={widget.boxButtonLabel}>LIHAT</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <ScrollView>
-                <Text style={styles.mainmenu}>MAINMENU</Text>
-                <View style={mainmenu.container}>
-                    <TouchableOpacity
-                        onPress = {() => navigation.replace('TeacherScreen')}
-                        style={mainmenu.boxButton}>
-                        <Image source={IconUserDefault} style={mainmenu.boxButtonImage}/>
-                        <Text style={widget.boxButtonLabel}>DATA GURU</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress = {() => navigation.replace('SupervisiScreen')}
-                        style={mainmenu.boxButton}>
-                        <Image source={IconPencilDefault} style={mainmenu.boxButtonImage}/>
-                        <Text style={widget.boxButtonLabel}>PENILAIAN</Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={mainmenu.container}>
-                    <TouchableOpacity
-                        onPress = {() => navigation.replace('ReportScreen')}
-                        style={mainmenu.boxButton}>
-                        <Image source={IconFileDefault} style={{
-                            height: 90,
-                            width: 66
-                        }}/>
-                        <Text style={widget.boxButtonLabel}>LAPORAN</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress = {() => alert('Halaman Tentang')}
-                        style={mainmenu.boxButton}>
-                        <Image source={IconQuestion} style={{
-                            width: 58,
-                            height: 90
-                        }}/>
-                        <Text style={widget.boxButtonLabel}>TENTANG</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </View>
+        </SafeAreaView>
     )
 }
 export default DashboardScreen;
