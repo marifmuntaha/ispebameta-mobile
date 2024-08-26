@@ -3,8 +3,7 @@ import {
     ActivityIndicator,
     Image,
     KeyboardAvoidingView,
-    Platform, StatusBar,
-    StyleSheet,
+    Platform, ScrollView, StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
@@ -13,7 +12,7 @@ import {
 import IconLogo from '../../images/IconLogo.png';
 import LogoUniv from '../../images/logo-univ.png';
 import {SafeAreaView} from "react-native-safe-area-context";
-import {APICore} from "../../utils/APICore";
+import {APICore, setAuthorization} from "../../utils/APICore";
 
 const LoginScreen = ({navigation}) => {
     const api = new APICore();
@@ -69,18 +68,18 @@ const LoginScreen = ({navigation}) => {
     return (
         <SafeAreaView style={{flex: 2, backgroundColor: '#161D6F'}}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{flex: 2}}>
-                <View style={{flex: 2, width: '100%', height: '100%', marginTop: 20}}>
+                <ScrollView style={{flex: 2, width: '100%', height: '100%', marginTop: 20}}>
                     <View style={{alignItems: "flex-start", justifyContent: 'flex-start'}}>
                         <Image source={LogoUniv} style={{marginLeft: 20}}/>
                     </View>
-                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: -100}}>
+                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: '25%', width: '100%'}}>
                         <Image source={IconLogo} style={{marginBottom: 10, width: 100, height: 100}}/>
-                        <Text style={{fontWeight: "bold", fontSize: 20, color: "#fff", textAlign: 'center'}}>MASUK</Text>
-                        <Text style={{fontSize: 14, color: "#fff", marginBottom: 10, textAlign: 'center'}}>Silahkan masuk menggunakan akun anda</Text>
+                        <Text style={{fontWeight: "bold", fontSize: 20, color: "#fff", textAlign: 'center', width: '100%'}}>MASUK</Text>
+                        <Text style={{fontSize: 14, color: "#fff", marginBottom: 10, textAlign: 'center', width: '100%'}}>Silahkan masuk menggunakan akun anda</Text>
                         <View style={{width: '85%'}}>
                             {error && (
                                 <View style={{backgroundColor: 'red', padding: 8, marginBottom: 5, borderRadius: 2}}>
-                                    <Text style={{fontSize: 14, color: 'white', fontWeight: 'bold'}}>Kesalahan! {error.message}</Text>
+                                    <Text style={{fontSize: 14, color: 'white', fontWeight: 'bold'}}>Kesalahan! {error['message']}</Text>
                                 </View>
                             )}
                             <Text style={styles.formInputLabel}>Alamat Email</Text>
@@ -108,9 +107,10 @@ const LoginScreen = ({navigation}) => {
                                     api.create('/auth/login', formData).then((resp) => {
                                         api.setLoggedInUser(resp.data.result);
                                         setLoading(false);
+                                        setAuthorization(resp.data.result.token);
                                         navigation.replace('DashboardScreen');
                                     }).catch(error => {
-                                        setError(error.response.data);
+                                        setError(error.response ? error.response.data : error);
                                         setLoading(false);
                                     })
                                 }}
@@ -130,7 +130,7 @@ const LoginScreen = ({navigation}) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+                </ScrollView>
             </KeyboardAvoidingView>
             <View style={{width: '100%', alignItems: 'center', marginBottom: 5}}>
                 <Text style={{fontSize: 14, color: 'white', textAlign: 'center', width: '100%'}}>Version 1.0.24</Text>

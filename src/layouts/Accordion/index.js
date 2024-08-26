@@ -2,15 +2,10 @@ import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {useEffect, useState} from "react";
 import Radio from "../Radio";
 
-const Accordion = ({navigation, data, result, setResult}) => {
+const Accordion = ({data, result, setResult, evaluation}) => {
     const [showID, setShowID] = useState(0);
     const [reference, setReference] = useState('')
     const [code, setCode] = useState([]);
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1
-        }
-    });
     const content = StyleSheet.create({
         container: {
             padding: 20
@@ -83,21 +78,32 @@ const Accordion = ({navigation, data, result, setResult}) => {
             justifyContent: 'center'
         }
     });
+    // useEffect(() => {
+    //     console.log(result);
+    // }, [result]);
+
     useEffect(() => {
-        console.log(result);
-    }, [result]);
+        const value = JSON.parse(evaluation[0].result);
+        console.log(value[1])
+    }, [evaluation])
     return (
-        <View style={styles.container}>
+        <View style={{flex: 1}}>
             {data && data.map((item) => (
                 <View key={item.id}>
                     {item.id !== showID && (
-                        <TouchableOpacity style={content.box} onPress={() => {
-                            setShowID(item.id);
-                            setReference('');
-                        }}>
+                        <TouchableOpacity style={{
+                            flexDirection: 'row',
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            borderRadius: 10,
+                            width: "100%",
+                            height: 'auto',
+                            backgroundColor: '#E9EAEC',
+                            marginBottom: 20
+                        }} onPress={() => {setShowID(item.id);setReference('');}}>
                             <View style={content.boxContent}>
                                 <View style={content.boxTextOpen}>
-                                    <Text style={{fontWeight: 'bold', fontSize: 20, color: "#161D6F"}}>
+                                    <Text style={{fontWeight: 'bold', fontSize: 14, color: "#161D6F"}}>
                                         POIN {item.name}{item.sub}
                                     </Text>
                                 </View>
@@ -105,7 +111,7 @@ const Accordion = ({navigation, data, result, setResult}) => {
                             <View style={content.boxButton}>
                                 <Text style={{
                                     fontWeight: 'bold',
-                                    fontSize: 25,
+                                    fontSize: 18,
                                     color: '#07F136'
                                 }}>A</Text>
                             </View>

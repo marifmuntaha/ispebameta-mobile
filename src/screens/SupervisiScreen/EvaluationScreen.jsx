@@ -1,12 +1,13 @@
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Header from "../../layouts/Header";
 import Accordion from "../../layouts/Accordion";
-import {useContext, useEffect, useState} from "react";
-import {UserContext} from "../UserScreen/UserContext";
+import {useEffect, useState} from "react";
 import {actionType, Dispatch} from "../../reducer";
+import {APICore} from "../../utils/APICore";
 
 const EvaluationScreen = ({route, navigation}) => {
-    const user = useContext(UserContext);
+    const api = new APICore();
+    const {user} = api.getLoggedInUser();
     const {aspectID, teacherID} = route.params;
     const styles = StyleSheet.create({
         container: {
@@ -36,18 +37,25 @@ const EvaluationScreen = ({route, navigation}) => {
     const [evaluation, setEvaluation] = useState([]);
     const [data, setData] = useState([])
     const [aspect, setAspect] = useState([]);
-    const [teacher, setTeacher] = useState([]);
+    const [teacher, setTeacher] = useState();
     const [instruments, setInstruments] = useState([]);
     const [instrument, setInstrument] = useState([]);
     const [reference, setReference] = useState([]);
     const [result, setResult] = useState([]);
     useEffect(() => {
-        Dispatch(actionType.EVALUATION_GET, {setData: setEvaluation}, {teacher: teacherID, aspect: aspectID}).then();
-        Dispatch(actionType.ASPECT_SHOW, {setData: setAspect}, {id: aspectID}).then();
-        Dispatch(actionType.TEACHER_SHOW, {setData: setTeacher}, {id: teacherID}).then();
-        Dispatch(actionType.INSTRUMENT_GET,
-            {setData: setInstruments},
-            {aspect: aspectID, with: 'indicator'}).then(resp => setData(resp));
+        api.get(`${'/teacher/' + teacherID}`, {with: 'subject'}).then(resp => {
+            setTeacher(resp.data.result);
+        }).catch(error => console.log(error));
+        api.get('/evaluation', {teacher: teacherID, aspect: aspectID}).then(resp => {
+            setEvaluation(resp.data.result);
+        }).catch(error => console.log(error));
+        api.get(`/aspect/${aspectID}`).then(resp => {
+            setAspect(resp.data.result);
+        }).catch(error => console.log(error));
+        api.get('/instrument', {aspect: aspectID, with: 'indicator'}).then(resp => {
+            setInstrument(resp.data.result);
+            setData(resp.data.result);
+        }).catch(error => console.log(error));
     }, []);
     useEffect(() => {
         setReference(() => {
@@ -62,18 +70,13 @@ const EvaluationScreen = ({route, navigation}) => {
         });
     }, [evaluation]);
     return (
-        <View style={styles.container}>
-            <Header
-                navigation={navigation}
-                backTo="SupervisiScreen"
-                title="PENILAIAN"
-                subtitle={teacher.name + "/" + teacher.subject}
-            />
-            <View style={styles.formButton}>
-                <Text style={styles.formButtonLabel}>{aspect.name}</Text>
+        <View style={{flex: 3}}>
+            <Header navigation={navigation} backTo="SupervisiScreen" title="PENILAIAN" subtitle={teacher !== undefined && teacher.name + " - " + teacher.subject.name}/>
+            <View style={{width: "90%", backgroundColor:"#FFC14F", borderRadius:20, height:50, alignSelf: "center", alignItems:"center", justifyContent:"center", marginTop: 20}}>
+                <Text style={{fontWeight: 'bold', color:"white", fontSize: 16}}>{aspect.name}</Text>
             </View>
-            <ScrollView style={content.container}>
-                <Accordion data={data} result={result} setResult={setResult}/>
+            <ScrollView style={{padding: 20}}>
+                <Accordion data={data} result={result} setResult={setResult} evaluation={evaluation}/>
                 <TouchableOpacity
                     onPress = {() => {
                         evaluation.length > 0

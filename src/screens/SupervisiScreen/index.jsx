@@ -2,16 +2,11 @@ import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react
 import Header from "../../layouts/Header";
 import UserIconDefault from "../../images/IconUserDefault.png";
 import ArrowRight from "../../images/icon-arrow-right.png";
-import React, {useContext, useEffect, useState} from "react";
-import {UserContext} from "../UserScreen/UserContext";
-import {actionType, Dispatch} from "../../reducer";
+import React, {useEffect, useState} from "react";
+import {APICore} from "../../utils/APICore";
 const SupervisiScreen = ({navigation}) => {
-    const user = useContext(UserContext);
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1
-        }
-    });
+    const api = new APICore();
+    const {user} = api.getLoggedInUser();
     const content = StyleSheet.create({
         container: {
             padding: 20
@@ -58,42 +53,52 @@ const SupervisiScreen = ({navigation}) => {
     const [teachers, setTeachers] = useState([]);
     const [aspects, setAspects] = useState([]);
     useEffect(() => {
-        Dispatch(actionType.TEACHER_GET, {setData: setTeachers}, {user: user.id}).then()
-        Dispatch(actionType.ASPECT_GET, {
-            setData: setAspects,
-        }).then()
+        api.get('/teacher', {user: user.id}).then(resp => {
+            setTeachers(resp.data.result)
+        }).catch(err => console.log(err));
+        api.get('/aspect').then(resp => {
+            setAspects(resp.data.result);
+        }).catch(err => console.log(err));
     }, []);
     return (
-        <View style={styles.container}>
-            <Header
-                navigation={navigation}
-                backTo="DashboardScreen"
-                title="SUPERVISI"
-                subtitle="Silahkan melakukan penilaian Guru"
-            />
-            <ScrollView style={content.container}>
+        <View style={{flex: 2}}>
+            <Header navigation={navigation} backTo="DashboardScreen" title="SUPERVISI" subtitle="Silahkan melakukan penilaian Guru"/>
+            <ScrollView style={{padding: 20}}>
                 {teachers && teachers.map((teacher) => (
                     <View key={teacher.id}>
                         {aspects && aspects.map((aspect) => (
-                            <View style={content.box} key={aspect.id}>
-                                <View style={content.boxContent}>
-                                    <View style={content.boxImage}>
-                                        <Image source={UserIconDefault} style={{width: 40, height: 40}}/>
+                            <View style={{flex: 3, flexDirection: 'row', justifyContent: "space-between", alignItems: "center", borderRadius: 5, paddingLeft: 10, paddingRight: 10, width: "100%", backgroundColor: '#E9EAEC', marginBottom: 20}} key={aspect.id}>
+                                <View style={{flex: 2, flexDirection: "row"}}>
+                                    <View style={{
+                                        width: 'auto',
+                                        height: 'auto',
+                                        borderColor: "#161D6F",
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
+                                        <Image source={UserIconDefault} style={{width: 30, height: 30}}/>
                                     </View>
-                                    <View style={content.boxText}>
-                                        <Text style={{fontWeight: 'bold', fontSize: 20, color: "#161D6F"}}>{teacher.name}</Text>
-                                        <Text style={{fontSize: 18, color: "#161D6F"}}>{aspect.name}</Text>
+                                    <View style={{margin: 10, alignItems: 'flex-start', justifyContent: 'center', width: '80%'}}>
+                                        <Text style={{fontWeight: 'bold', fontSize: 14, color: "#161D6F", width: '100%'}}>{teacher.name}</Text>
+                                        <Text style={{fontSize: 14, color: "#161D6F", width: '100%'}}>{aspect.name}</Text>
                                     </View>
                                 </View>
                                 <TouchableOpacity
-                                    style={content.boxButton}
+                                    style={{
+                                        width: 'auto',
+                                        height: '100%',
+                                        borderColor: "#BC0808",
+                                        alignSelf: "flex-end",
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
                                     onPress={() => {
                                         navigation.navigate('EvaluationScreen', {
                                             aspectID: aspect.id,
                                             teacherID: teacher.id
                                         })
                                     }}>
-                                    <Image source={ArrowRight} style={{width: 20, height: 2}}/>
+                                    <Image source={ArrowRight} style={{width: 20, height: 20}}/>
                                 </TouchableOpacity>
                             </View>
                         ))}

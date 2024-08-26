@@ -11,8 +11,8 @@ const setAuthorization = (token) => {
 }
 
 const getUserFromCookie = () => {
-    const user = SecureStore.getItem('user')
-    return user ? (typeof user == 'object' ? user : JSON.parse(user)) : null
+    const auth = SecureStore.getItem('auth')
+    return auth ? (typeof auth == 'object' ? auth : JSON.parse(auth)) : null
 }
 
 class APICore {
@@ -35,10 +35,14 @@ class APICore {
         return axios.post(url, data)
     }
 
+    delete = (url) => {
+        return axios.delete(url)
+    }
+
     setLoggedInUser = (session) => {
         session
-            ? SecureStore.setItem('user', JSON.stringify(session))
-            : SecureStore.deleteItemAsync('user');
+            ? SecureStore.setItem('auth', JSON.stringify(session))
+            : SecureStore.deleteItemAsync('auth');
     }
 
     getLoggedInUser = () => {
@@ -46,10 +50,9 @@ class APICore {
     }
 }
 
-const user = getUserFromCookie();
-if (user) {
-    const {token} = user;
-    console.log(token)
+const auth = getUserFromCookie();
+if (auth) {
+    const {token} = auth;
     if (token) {
         setAuthorization(token)
     }

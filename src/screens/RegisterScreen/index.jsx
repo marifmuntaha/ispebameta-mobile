@@ -5,14 +5,11 @@ import {
     ScrollView,
     StyleSheet,
     Text,
-    TextInput, ToastAndroid,
-    TouchableOpacity,
+    TextInput, TouchableOpacity,
     View
 } from "react-native";
 import IconLogo from '../../images/IconLogo.png';
-import {actionType, Dispatch} from "../../reducer";
 import React, {useState} from "react";
-import Toast from 'react-native-root-toast';
 import {SafeAreaView} from "react-native-safe-area-context";
 import LogoUniv from "../../images/logo-univ.png";
 import {APICore} from "../../utils/APICore";
@@ -100,7 +97,7 @@ const RegisterScreen = ({navigation}) => {
                                         fontSize: 14,
                                         color: 'white',
                                         fontWeight: 'bold'
-                                    }}>Kesalahan! {error.message}</Text>
+                                    }}>Kesalahan! {error['message']}</Text>
                                 </View>
                             )}
                             {success && (
