@@ -1,4 +1,4 @@
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import IconLogo from "../../images/IconLogo.png";
 import IconUserWhite from "../../images/IconUserOutlineWhite.png";
 import IconUserDefault from "../../images/IconUserDefault.png";
@@ -13,20 +13,6 @@ const DashboardScreen = ({navigation}) => {
     const {user} = api.getLoggedInUser();
     const [teachers, setTeachers] = useState([]);
     const [reports, setReports] = useState([]);
-    const widget = StyleSheet.create({
-        container: {
-
-        },
-        box: {
-        },
-        boxText: {
-        },
-        boxButton: {
-
-        },
-        boxButtonLabel: {
-        }
-    })
     const mainmenu = StyleSheet.create({
         boxButton: {
             borderRadius: 20,
@@ -122,7 +108,7 @@ const DashboardScreen = ({navigation}) => {
                             <Text style={{fontWeight: 'bold', color:"#161D6F", fontSize: 18, marginTop: 5}}>LAPORAN</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            onPress = {() => alert('Halaman Tentang')}
+                            onPress = {() => Alert.alert('Tentang', 'Aplikasi ini dikembangkan oleh Ali Ma\'sum Effendi, (S.Pd.) Mahasiswa Pascasarjana Program Studi   Pendidikan Guru Madrasah Ibtidaiyah (PGMI) UIN SALATIGA disusun sebagai penyelesaian Studi S-2.')}
                             style={mainmenu.boxButton}>
                             <Image source={IconQuestion} style={{
                                 width: 58,

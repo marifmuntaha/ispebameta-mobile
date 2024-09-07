@@ -1,4 +1,4 @@
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import Header from "../../layouts/Header";
 import UserIconDefault from "../../images/IconUserDefault.png";
 import ArrowRight from "../../images/icon-arrow-right.png";
@@ -7,49 +7,6 @@ import {APICore} from "../../utils/APICore";
 const SupervisiScreen = ({navigation}) => {
     const api = new APICore();
     const {user} = api.getLoggedInUser();
-    const content = StyleSheet.create({
-        container: {
-            padding: 20
-        },
-        box: {
-            flexDirection: 'row',
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: 30,
-            width: "100%",
-            height: 70,
-            backgroundColor: '#E9EAEC',
-            marginBottom: 20
-        },
-        boxContent: {
-            flexDirection: "row"
-        },
-        boxImage: {
-            width: 70,
-            height: 70,
-            borderRadius: 70,
-            borderColor: "#161D6F",
-            borderWidth: 3,
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        boxText: {
-            marginLeft: 10,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        boxButton: {
-            width: 50,
-            height: 50,
-            borderRadius: 50,
-            marginRight: 20,
-            borderColor: "#F1F107",
-            borderWidth: 3,
-            alignSelf: "center",
-            alignItems: 'center',
-            justifyContent: 'center'
-        }
-    });
     const [teachers, setTeachers] = useState([]);
     const [aspects, setAspects] = useState([]);
     useEffect(() => {

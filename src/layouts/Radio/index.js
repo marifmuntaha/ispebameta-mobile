@@ -1,36 +1,15 @@
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {Text, TouchableOpacity, View} from "react-native";
 
-const Radio = ({data, instrument, result, setResult, setReference, code, setCode}) => {
-    const styles = StyleSheet.create({
-        form: {
-            flexDirection: "row",
-            alignItems: 'center',
-            marginRight: 30,
-        },
-        radio: {
-            height: 20,
-            width: 20,
-            borderRadius: 10,
-            borderWidth: 2,
-            borderColor: '#161D6F',
-            alignItems: 'center',
-            justifyContent: 'center',
-        },
-        radioSelected: {
-            height: 12,
-            width: 12,
-            borderRadius: 6,
-            backgroundColor: '#161D6F',
-        },
-        radioLabel: {
-            marginLeft: 10,
-            marginBottom: 10,
-            fontSize: 18,
-            color: '#161D6F'
-        }
-    })
-    const [radioSelected, setRadioSelected] = useState(1);
+const Radio = ({data, instrument, result, setResult, setReference, code, setCode, idx}) => {
+    const [radioSelected, setRadioSelected] = useState();
+    useEffect(() => {
+        let value = result && result.filter((value) => {
+            return value.instrument === instrument.id
+        })
+        value.length > 0 && setRadioSelected( value[0].indicator.id)
+        value.length > 0 && setReference(value[0].indicator.reference)
+    }, [instrument, result]);
     return (
         <View>
             {data && data.map((item) => (
@@ -38,10 +17,10 @@ const Radio = ({data, instrument, result, setResult, setReference, code, setCode
                     <TouchableOpacity
                         key={item.id}
                         onPress={() => {
-                            setRadioSelected(item.id);
                             let value = result.filter((value) => {
                                 return value.instrument !== instrument.id
                             });
+                            let codes = [...code]
                             value.push({
                                 instrument: instrument.id,
                                 name: instrument.name,
@@ -49,16 +28,16 @@ const Radio = ({data, instrument, result, setResult, setReference, code, setCode
                             });
                             setResult(value);
                             setReference(item.reference);
-                            setCode(value.push(item));
+                            codes[instrument.id] = item.code
+                            setCode(codes);
                         }}
-                        style={styles.form}
-                    >
-                        <View style={styles.radio}>
+                        style={{flexDirection: "row", alignItems: 'center', marginRight: 30}}>
+                        <View style={{height: 20, width: 20, borderRadius: 10, borderWidth: 2, borderColor: '#161D6F', alignItems: 'center', justifyContent: 'center'}}>
                             {radioSelected === item.id && (
-                                <View style={styles.radioSelected}/>
+                                <View style={{height: 12, width: 12, borderRadius: 6, backgroundColor: '#161D6F'}}/>
                             )}
                         </View>
-                        <Text style={styles.radioLabel}>{item.desc}</Text>
+                        <Text style={{textAlign: 'left',marginLeft: 10, marginBottom: 10, fontSize: 14, color: '#161D6F'}}>{item.desc}</Text>
                     </TouchableOpacity>
                 </View>
             ))}

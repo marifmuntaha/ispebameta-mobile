@@ -1,8 +1,7 @@
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Header from "../../layouts/Header";
 import Accordion from "../../layouts/Accordion";
-import {useEffect, useState} from "react";
-import {actionType, Dispatch} from "../../reducer";
+import React, {useEffect, useState} from "react";
 import {APICore} from "../../utils/APICore";
 
 const EvaluationScreen = ({route, navigation}) => {
@@ -14,34 +13,27 @@ const EvaluationScreen = ({route, navigation}) => {
             flex: 1
         },
         formButton: {
-            width: "90%",
             backgroundColor: "#FFC14F",
-            borderRadius: 30,
-            height: 60,
-            alignSelf: "center",
+            borderRadius: 5,
+            height: 50,
             alignItems: "center",
             justifyContent: "center",
-            marginTop: 20
+            marginBottom: 30
         },
         formButtonLabel: {
             fontWeight: 'bold',
             color: "white",
-            fontSize: 18
-        }
-    });
-    const content = StyleSheet.create({
-        container: {
-            padding: 20
+            fontSize: 14
         }
     });
     const [evaluation, setEvaluation] = useState([]);
     const [data, setData] = useState([])
     const [aspect, setAspect] = useState([]);
     const [teacher, setTeacher] = useState();
-    const [instruments, setInstruments] = useState([]);
     const [instrument, setInstrument] = useState([]);
     const [reference, setReference] = useState([]);
     const [result, setResult] = useState([]);
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
         api.get(`${'/teacher/' + teacherID}`, {with: 'subject'}).then(resp => {
             setTeacher(resp.data.result);
@@ -71,39 +63,53 @@ const EvaluationScreen = ({route, navigation}) => {
     }, [evaluation]);
     return (
         <View style={{flex: 3}}>
-            <Header navigation={navigation} backTo="SupervisiScreen" title="PENILAIAN" subtitle={teacher !== undefined && teacher.name + " - " + teacher.subject.name}/>
+            <Header navigation={navigation} backTo="SupervisiScreen" title="PENILAIAN" subtitle={teacher !== undefined && teacher['name'] + " - " + teacher['subject'].name}/>
             <View style={{width: "90%", backgroundColor:"#FFC14F", borderRadius:20, height:50, alignSelf: "center", alignItems:"center", justifyContent:"center", marginTop: 20}}>
                 <Text style={{fontWeight: 'bold', color:"white", fontSize: 16}}>{aspect.name}</Text>
             </View>
             <ScrollView style={{padding: 20}}>
-                <Accordion data={data} result={result} setResult={setResult} evaluation={evaluation}/>
+                <Accordion data={data} result={result} setResult={setResult}/>
                 <TouchableOpacity
                     onPress = {() => {
-                        evaluation.length > 0
-                            ? Dispatch(actionType.EVALUATION_UPDATE, {
-                                formData: {
-                                    id: evaluation[0].id,
-                                    user: user.id,
-                                    teacher: teacherID,
-                                    aspect: aspectID,
-                                    finish: 0,
-                                    result: JSON.stringify(result)
-                                }
-                            }).then()
-                            : Dispatch(actionType.EVALUATION_STORE, {
-                                formData: {
-                                    user: user.id,
-                                    teacher: teacherID,
-                                    aspect: aspectID,
-                                    finish: 0,
-                                    result: JSON.stringify(result)
-                                }
-                            }).then()
+                        setLoading(true);
+                        evaluation && evaluation.length > 0
+                            ? api.update(`${'/evaluation/' + evaluation[0].id}`, {
+                                id: evaluation[0].id,
+                                user: user.id,
+                                teacher: teacherID,
+                                aspect: aspectID,
+                                finish: 0,
+                                result: JSON.stringify(result)
+                            }).then(() => {
+                                setLoading(false);
+                            }).catch(error => {
+                                setLoading(false);
+                                console.log('error', error);
+                            })
+                            : api.create('/evaluation', {
+                                user: user.id,
+                                teacher: teacherID,
+                                aspect: aspectID,
+                                finish: 0,
+                                result: JSON.stringify(result)
+                            }).then(() => {
+                                setLoading(false);
+                            }).catch(error => {
+                                setLoading(false);
+                                console.log('error', error)
+                            })
                     }}
                     style={styles.formButton}>
-                    <Text style={styles.formButtonLabel}>SIMPAN</Text>
+                    {
+                        loading
+                            ? <ActivityIndicator size="large"/>
+                            : <Text style={styles.formButtonLabel}>SIMPAN</Text>
+                    }
                 </TouchableOpacity>
             </ScrollView>
+            <View style={{width: '100%', alignItems: 'center', marginBottom: 5}}>
+                <Text style={{fontSize: 14, color: '#161D6F', textAlign: 'center', width: '100%'}}>Version 1.0.24</Text>
+            </View>
         </View>
     )
 }

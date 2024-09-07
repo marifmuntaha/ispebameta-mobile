@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
@@ -33,6 +34,10 @@ class APICore {
 
     create = (url, data) => {
         return axios.post(url, data)
+    }
+
+    update = (url, data) => {
+        return axios.put(url, data)
     }
 
     delete = (url) => {

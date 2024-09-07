@@ -1,162 +1,66 @@
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Text, TouchableOpacity, View} from "react-native";
 import {useEffect, useState} from "react";
 import Radio from "../Radio";
 
-const Accordion = ({data, result, setResult, evaluation}) => {
+const Accordion = ({data, result, setResult}) => {
     const [showID, setShowID] = useState(0);
     const [reference, setReference] = useState('')
     const [code, setCode] = useState([]);
-    const content = StyleSheet.create({
-        container: {
-            padding: 20
-        },
-        box: {
-            flexDirection: 'row',
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: 30,
-            width: "100%",
-            height: 70,
-            backgroundColor: '#E9EAEC',
-            marginBottom: 20
-        },
-        boxContent: {
-            flexDirection: "row"
-        },
-        boxText: {
-            marginLeft: 20,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        boxButton: {
-            width: 50,
-            height: 50,
-            borderRadius: 50,
-            marginRight: 20,
-            borderColor: "#07F136",
-            borderWidth: 3,
-            alignSelf: "center",
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        open: {
-            width: "100%",
-            backgroundColor: '#E9EAEC',
-            borderRadius: 20,
-            marginBottom: 20,
-        },
-        boxOpen: {
-            flexDirection: 'row',
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: 70,
-        },
-        boxContentOpen: {
-            flexDirection: "row"
-        },
-        boxTextOpen: {
-            marginLeft: 20,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        },
-        boxButtonOpen: {
-            width: 50,
-            height: 50,
-            borderRadius: 50,
-            marginRight: 20,
-            borderColor: "#07F136",
-            borderWidth: 3,
-            alignSelf: "center",
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        boxTextContentOpen: {
-            marginLeft: 20,
-            marginRight: 20,
-            marginBottom: 20,
-            alignItems: 'flex-start',
-            justifyContent: 'center'
-        }
-    });
-    // useEffect(() => {
-    //     console.log(result);
-    // }, [result]);
-
     useEffect(() => {
-        const value = JSON.parse(evaluation[0].result);
-        console.log(value[1])
-    }, [evaluation])
+        let codes = [];
+        result.map((code) => {
+            codes[code.indicator.instrument] = code.indicator.code;
+        })
+        setCode(codes)
+    }, [data, result]);
     return (
         <View style={{flex: 1}}>
-            {data && data.map((item) => (
+            {data && data.map((item, idx) => (
                 <View key={item.id}>
                     {item.id !== showID && (
-                        <TouchableOpacity style={{
-                            flexDirection: 'row',
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            borderRadius: 10,
-                            width: "100%",
-                            height: 'auto',
-                            backgroundColor: '#E9EAEC',
-                            marginBottom: 20
-                        }} onPress={() => {setShowID(item.id);setReference('');}}>
-                            <View style={content.boxContent}>
-                                <View style={content.boxTextOpen}>
+                        <TouchableOpacity
+                            style={{flex: 3, flexDirection: 'row', justifyContent: "space-between", alignItems: "center", borderRadius: 5, paddingLeft: 10, padding: 10, width: "100%", backgroundColor: '#E9EAEC', marginBottom: 20}}
+                            onPress={() => {
+                                setShowID(item.id);
+                                setReference('');
+                            }}>
+                            <View style={{flexDirection: "row"}}>
+                                <View style={{marginLeft: 10, alignItems: 'flex-start', justifyContent: 'center'}}>
                                     <Text style={{fontWeight: 'bold', fontSize: 14, color: "#161D6F"}}>
                                         POIN {item.name}{item.sub}
                                     </Text>
                                 </View>
                             </View>
-                            <View style={content.boxButton}>
-                                <Text style={{
-                                    fontWeight: 'bold',
-                                    fontSize: 18,
-                                    color: '#07F136'
-                                }}>A</Text>
+                            <View style={{width: 40, height: 40, borderRadius: 40, marginRight: 10, borderColor: "#07F136", borderWidth: 3, alignSelf: "center", alignItems: 'center', justifyContent: 'center'}}>
+                                <Text style={{fontWeight: 'bold', fontSize: 14, color: '#07F136'}}>{code.length > 0 && code[item.id]}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
                     {item.id === showID && (
                         <View>
-                            <View style={content.open}>
-                                <View style={content.boxOpen}>
-                                    <View style={content.boxContentOpen}>
-                                        <View style={content.boxTextOpen}>
-                                            <Text style={{
-                                                fontWeight: 'bold',
-                                                fontSize: 20,
-                                                color: "#161D6F"
-                                            }}>POIN {item.name}{item.sub}</Text>
-                                        </View>
-                                    </View>
-                                    <View style={content.boxButtonOpen}>
-                                        <Text style={{
-                                            fontWeight: 'bold',
-                                            fontSize: 25,
-                                            color: '#07F136'
-                                        }}>A</Text>
+                            <TouchableOpacity
+                                style={{width: "100%", backgroundColor: '#E9EAEC', borderRadius: 5, marginBottom: 10, padding: 10}}
+                                onPress={() => {
+                                    setShowID(0);
+                                    setReference('');
+                                }}>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 10,marginLeft: 10, marginRight: 10}}>
+                                    <Text style={{justifyContent: 'center', fontWeight: 'bold', fontSize: 14, color: "#161D6F"}}>POIN {item.name}{item.sub}</Text>
+                                    <View style={{width: 40, height: 40, borderRadius: 40, borderColor: "#07F136", borderWidth: 3, alignSelf: "center", alignItems: 'center', justifyContent: 'center'}}>
+                                        <Text style={{fontWeight: 'bold', fontSize: 14, color: '#07F136'}}>{code.length > 0 && code[item.id]}</Text>
                                     </View>
                                 </View>
-                                <View style={content.boxTextContentOpen}>
-                                    <Text style={{fontSize: 18, color: "#161D6F"}}>{item.desc}</Text>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginLeft: 10, marginRight: 10}}>
+                                    <Text style={{textAlign: 'justify',fontSize: 14, color: "#161D6F"}}>{item.desc}</Text>
                                 </View>
-                            </View>
-                            <View style={content.open}>
-                                <View style={content.boxOpen}>
-                                    <View style={content.boxContentOpen}>
-                                        <View style={content.boxTextOpen}>
-                                            <Text style={{
-                                                fontWeight: 'bold',
-                                                fontSize: 20,
-                                                color: "#161D6F"
-                                            }}>INDIKATOR</Text>
-                                        </View>
-                                    </View>
+                            </TouchableOpacity>
+                            <View style={{width: "100%", backgroundColor: '#E9EAEC', borderRadius: 5, marginBottom: 10, padding: 10}}>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+                                    <Text style={{fontWeight: 'bold', fontSize: 14, color: "#161D6F"}}>INDIKATOR</Text>
                                 </View>
-                                <View style={content.boxTextContentOpen}>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 10, marginLeft: 10, marginRight: 10}}>
                                     <Radio
-                                        data={item.indicators}
+                                        data={item['indicators']}
                                         instrument={{
                                             id: item.id,
                                             name: item.name
@@ -166,24 +70,17 @@ const Accordion = ({data, result, setResult, evaluation}) => {
                                         setResult={setResult}
                                         code={code}
                                         setCode={setCode}
+                                        idx={idx}
 
                                     />
                                 </View>
                             </View>
-                            <View style={content.open}>
-                                <View style={content.boxOpen}>
-                                    <View style={content.boxContentOpen}>
-                                        <View style={content.boxTextOpen}>
-                                            <Text style={{
-                                                fontWeight: 'bold',
-                                                fontSize: 20,
-                                                color: "#161D6F"
-                                            }}>REKOMENDASI</Text>
-                                        </View>
-                                    </View>
+                            <View style={{width: "100%", backgroundColor: '#E9EAEC', borderRadius: 5, marginBottom: 10, padding: 10}}>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+                                    <Text style={{fontWeight: 'bold', fontSize: 14, color: "#161D6F"}}>REKOMENDASI</Text>
                                 </View>
-                                <View style={content.boxTextContentOpen}>
-                                    <Text style={{fontSize: 18, color: "#161D6F"}}>{reference}</Text>
+                                <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: "center", marginBottom: 10, marginLeft: 10, marginRight: 10}}>
+                                    <Text style={{fontSize: 14, color: "#161D6F", textAlign: 'justify'}}>{reference}</Text>
                                 </View>
                             </View>
                         </View>

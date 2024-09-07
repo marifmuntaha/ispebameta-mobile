@@ -1,8 +1,6 @@
-import {StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, StatusBar} from "react-native";
+import {StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput} from "react-native";
 import Header from "../../layouts/Header";
-import {UserContext} from "./UserContext";
-import React, {useContext, useEffect} from "react";
-import * as SecureStore from "expo-secure-store";
+import React from "react";
 import {APICore} from "../../utils/APICore";
 import {SafeAreaView} from "react-native-safe-area-context";
 
